@@ -66,6 +66,8 @@ def sanity_checks(args):
     assert args.alpha_mse >= 0.
     assert args.alpha_cos >= 0.
     assert args.alpha_ce + args.alpha_mlm + args.alpha_clm + args.alpha_mse + args.alpha_cos > 0.
+    
+    logger.info('Sanity checked!')
 
 def freeze_pos_embeddings(student, args):
     if args.student_type == 'roberta':
@@ -105,7 +107,7 @@ def main():
                         help="Linear weight for the distillation loss. Must be >=0.")
     parser.add_argument("--alpha_mlm", default=0.0, type=float,
                         help="Linear weight for the MLM loss. Must be >=0. Should be used in coonjunction with `mlm` flag.")
-    parser.add_argument("--alpha_clm", default=0.5, type=float,
+    parser.add_argument("--alpha_clm", default=0.0, type=float, # 0.5 -> 0.0
                         help="Linear weight for the CLM loss. Must be >=0.")
     parser.add_argument("--alpha_mse", default=0.0, type=float,
                         help="Linear weight of the MSE loss. Must be >=0.")
@@ -196,7 +198,7 @@ def main():
         logger.info(f'Param: {args}')
         with open(os.path.join(args.dump_path, 'parameters.json'), 'w') as f:
             json.dump(vars(args), f, indent=4)
-        git_log(args.dump_path)
+        #git_log(args.dump_path)
 
     student_config_class, student_model_class, _ = MODEL_CLASSES[args.student_type]
     teacher_config_class, teacher_model_class, teacher_tokenizer_class = MODEL_CLASSES[args.teacher_type]
